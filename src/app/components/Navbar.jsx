@@ -7,28 +7,35 @@ import Image from 'next/image'
 import { signOut } from 'next-auth/react'
 
 function Navbar({ session }) {
-  return (
-    <nav className='flex justify-between items-center shadow-md p-5'>
-        <div>
-            <Link href="/">
-                <Image src={NextLogo} width={100} height={100} alt='nextjs logo' /> 
-            </Link>
-        </div>
-        <ul className='flex space-x-4'>
-            {!session ? (
-                <>
-                    <li><Link href="/login">Login</Link></li>
-                    <li><Link href="/register">Register</Link></li>
-                </>
-            ) : (
-                <>
-                    <li><Link href="/welcome" className='bg-gray-500 text-white border py-2 px-3 rounded-md text-lg my-2'>Profile</Link></li>
-                    <li><a onClick={() => signOut()} className='bg-red-500 text-white border py-2 px-3 rounded-md text-lg my-2'>Logout</a></li>
-                </>
-            )}
-        </ul>
-    </nav>
-  )
+    return (
+        <nav className='flex justify-between items-center shadow-md p-5'>
+            <div className='flex w-1/2 '>
+                <Link href="/">
+                    <Image src={NextLogo} width={100} height={100} alt='nextjs logo' />
+                </Link>
+                <ul className='mx-10 flex  gap-4 justify-between'>
+                    <li className='font-bold cursor-pointer' ><Link href='/Strategy'> Copy Trading</Link></li>
+                    <li className='font-bold cursor-pointer'><Link href='/dashboard'> Dashboard</Link></li>
+                    <li className='font-bold cursor-pointer'><Link href='/subscribed'>Subscribed</Link></li>
+                    <li className='font-bold cursor-pointer'>PriceChart</li>
+                    <li className='font-bold cursor-pointer'><Link href='/bill'>Bill</Link></li>
+                </ul>
+            </div>
+            <ul className='flex space-x-4'>
+                {!session ? (
+                    <>
+                        <li><Link href="/login">Login</Link></li>
+                        <li><Link href="/register">Register</Link></li>
+                    </>
+                ) : (
+                    <>
+                        <li><Link href="/welcome" className=''>Profile</Link></li>
+                        <li><a onClick={() => signOut()} className=''>Logout</a></li>
+                    </>
+                )}
+            </ul>
+        </nav>
+    )
 }
 
 export default Navbar

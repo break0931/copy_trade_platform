@@ -15,13 +15,9 @@ export default function Home() {
     <main>
       <Container>
         <Navbar session={session} />
-          <div className="flex-grow text-center p-10">
-            <div className="flex justify-center my-10">
-              <Image src={NextLogo} width={300} height={100} alt="NextJS Logo" />
-            </div>
-            <h3 className="text-5xl">NextJS Login/Register Demo</h3>
-            <p className="text-2xl mt-3">NextJS is the best javascript framework</p>
-          </div>
+        <div className="flex-grow ">
+            dsadsa
+        </div>
         <Footer />
       </Container>
     </main>

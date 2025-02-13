@@ -12,6 +12,13 @@ module.exports = {
         "gradient-conic":
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
       },
+      colors: {
+        brandColor: "var(--brandColor)", // ใช้ตัวแปร CSS
+        profit: 'var(--profit)'
+      },
+      screens: {
+        xs: "400px", // Define the `xs` breakpoint (adjust size as needed)
+      },
     },
   },
   plugins: [],
