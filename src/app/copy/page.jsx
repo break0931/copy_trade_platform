@@ -24,8 +24,8 @@ function Copy() {
     console.log("Selected Account:", selectedAccount);
   return (
     <Container>
-        <Navbar/>
-        <div className='min-h-screen mx-4 md:mx-20 xl:mx-40 flex justify-center '>
+        
+        <div className='min-h-screen flex justify-center '>
             <div className='w-lg border rounded-xl p-10 m-4  text-md mb-4 h-max bg-white'>
                 <div className='flex justify-between font-bold '>
                     <div className='flex items-center space-x-4 w-1/2'>
@@ -103,7 +103,7 @@ function Copy() {
             </div>
            
         </div>
-        <Footer/>
+        
     </Container>
     
   )

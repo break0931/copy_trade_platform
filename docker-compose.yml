@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  next-app:
+    build: .
+    ports:
+      - "4000:4000"  # Expose port 3000 for Next.js
+    depends_on:
+      - mongodb
+    env_file: 
+      - .env
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: npm run dev
+
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb_container
+    restart: always
+    ports:
+      - "27017:27017"  # MongoDB default port
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: password
+    volumes:
+      - mongo_data:/data/db
+
+volumes:
+  mongo_data:
