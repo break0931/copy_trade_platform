@@ -244,8 +244,6 @@ import GoogleProvider from "next-auth/providers/google";
 import { connectMongoDB } from "../../../../../lib/mongodb";
 import User from "../../../../../models/user";
 import bcrypt from 'bcryptjs'
-const GOOGLE_CLIENT_ID=process.env.GOOGLE_CLIENT_ID;
-const GOOGLE_CLIENT_SECRET=process.env.GOOGLE_CLIENT_SECRET;
 
 
 

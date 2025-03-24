@@ -15,7 +15,7 @@ function Stats() {
   console.log("JWT Token:", session?.user);
 
 
-  const { id } = useParams()
+  const { id } = useParams() 
 
   if (!id) {
     return (
@@ -36,7 +36,7 @@ function Stats() {
     return [];
   }, [trade, id]);
 
- console.log(filteredPositions)
+  console.log(filteredPositions)
 
 
 
@@ -102,7 +102,6 @@ function Stats() {
 
   useEffect(() => {
     const fetchSubscribesinfo = async () => {
-      setIsLoading(true)
       try {
         const response = await fetch("/api/subscribedinfo", {
           method: "POST",
@@ -117,46 +116,86 @@ function Stats() {
 
       } catch (error) {
         console.error('Error fetching strategies:', error)
-      } finally {
-        setIsLoading(false)
       }
     }
     fetchSubscribesinfo()
 
-  
+
   }, [id])
-  console.log("sub " ,subscribe)
+  console.log("sub ", subscribe)
 
 
-      
+
+
+  // useEffect(() => {
+  //   if (subscribe) {
+  //     const fetchStats = async () => {
+
+  //       const res = await fetch("/api/trade-history", {
+  //         method: "POST",
+  //         headers: { "Content-Type": "application/json" },
+  //         body: JSON.stringify({ mt5_id: subscribe.mt5_id }),
+  //       });
+
+  //       if (!res.ok) {
+  //         throw new Error('Failed to fetch data');
+  //       }
+  //       console.log("not error")
+  //       const result = await res.json();
+  //       setTrade(result);
+  //   };
+
+  //   fetchStats();
+  // }
+  // }, [subscribe]);
 
   useEffect(() => {
-    if (subscribe) {
+    if (subscribe && subscribe.mt5_id) {
       const fetchStats = async () => {
+        setIsLoading(true)
+        try {
+          let tradeHistory = null;
 
-        const res = await fetch("/api/trade-history", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ mt5_id: subscribe.mt5_id }),
-        });
+          // Polling for the trade history until it matches the mt5_id
+          while (!tradeHistory || tradeHistory.mt5_id !== subscribe.mt5_id) {
+            const res = await fetch("/api/trade-history", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ mt5_id: subscribe.mt5_id }),
+            });
 
-        if (!res.ok) {
-          throw new Error('Failed to fetch data');
+            if (!res.ok) {
+              throw new Error("Failed to fetch data");
+            }
+
+            tradeHistory = await res.json();
+
+            if (!tradeHistory || tradeHistory.mt5_id !== subscribe.mt5_id) {
+              // No match or trade history not available, wait before retrying
+              console.log("No match for mt5_id yet, retrying...");
+              await new Promise((resolve) => setTimeout(resolve, 500)); // Wait 1 second before retrying
+            }
+          }
+
+          // If we got the correct trade history, set it to state
+          setTrade(tradeHistory);
+        } catch (err) {
+
+        } finally {
+          setIsLoading(false)
         }
-        console.log("not error")
-        const result = await res.json();
-        setTrade(result);
-    };
 
-    fetchStats();
-  }
-  }, [subscribe]);
+      };
+
+      fetchStats();
+    }
+  }, [subscribe.mt5_id]);
 
 
 
-  
+
   const { winRate, totalPnL, rrRatio, wins, losses, totalTrades } = useMemo(() => {
-          
+
 
     if (!filteredPositions || filteredPositions.length === 0) {
       return { winRate: 0, totalPnL: 0, rrRatio: 0 };
@@ -190,7 +229,7 @@ function Stats() {
 
     return { winRate, totalPnL, rrRatio, wins, losses, totalTrades };
   }, [trade]);
-  
+
 
 
   const optionPNL = useMemo(() => ({
@@ -402,7 +441,7 @@ function Stats() {
   ]
 
 
-  
+
 
   if (!trade?.positions || trade.positions.length === 0) {
     return (
@@ -418,20 +457,20 @@ function Stats() {
     const [year, month, day] = date.split(".");
     return `${year.slice(2)}/${month}/${day}`;
   };
-  const cumulativeProfit = filteredPositions && filteredPositions.length > 0 
-  ? filteredPositions.reduce((acc, { profit, time }, index) => {
+  const cumulativeProfit = filteredPositions && filteredPositions.length > 0
+    ? filteredPositions.reduce((acc, { profit, time }, index) => {
       const profitValue = parseFloat(profit) || 0;
       const prevValue = acc.length > 0 ? acc[acc.length - 1].value : 0;
       const cumulativeValue = prevValue + profitValue;
-      
-      acc.push({ 
-        name: formatDate(time), 
-        value: cumulativeValue 
+
+      acc.push({
+        name: formatDate(time),
+        value: cumulativeValue
       });
-      
+
       return acc;
     }, [])
-  : [];
+    : [];
   console.log(cumulativeProfit)
 
 
@@ -588,25 +627,12 @@ function Stats() {
                   <div className='space-y-2'>
                     <h2 className='text-2xl font-bold text-white'>Subscribed id : {subscribe._id}</h2>
                     <div className=''>
-                      {/* <div className="flex space-x-2">
-                        <div className={`${mt5account.account_type === 'real'
-                          ? 'bg-green-700'
-                          : 'bg-yellow-600'
-                          } px-2 py-1 rounded text-xs font-medium text-white`}>
-                          {mt5account.account_type}
-                        </div>
-                        <div className="bg-gray-700 px-2 py-1 rounded text-xs font-medium text-white">MT5</div>
-                      </div> */}
+                     
                     </div>
-                    <div className='text-gray-300 font-medium'>Status : {subscribe.status }</div>
+                    <div className='text-gray-300 font-medium'>Status : {subscribe.status}</div>
 
                   </div>
-                  {/* <Link href={`/copy/${name}`}>
-                    <button className='bg-gradient-to-r from-cyan-500 to-blue-600 hover:shadow-cyan-500/30 text-white font-medium py-2 px-4 rounded-lg transition-all transform hover:scale-105 shadow-lg'>
-                      Copy Strategy
-                      <ArrowUpRight className="w-4 h-4 inline ml-1" />
-                    </button>
-                  </Link> */}
+                 
                 </div>
 
                 <div className='grid grid-cols-2 gap-4 mb-6'>

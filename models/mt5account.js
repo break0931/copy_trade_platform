@@ -18,6 +18,9 @@ const mt5_accountSchema = new Schema(
             type: String,
             required: true,
         },
+        status:{
+            type:String
+        }
     },
     { timestamps: true }
 )

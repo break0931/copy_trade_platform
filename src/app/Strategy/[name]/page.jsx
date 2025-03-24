@@ -26,7 +26,7 @@ function Dashboard() {
 
   useEffect(() => {
     const fetchstrategyinfo = async () => {
-      setIsLoading(true)
+      
       try {
         const response = await fetch("/api/strategyinfo", {
           method: "POST",
@@ -41,9 +41,7 @@ function Dashboard() {
         console.log("strategy   ", data)
       } catch (error) {
         console.error('Error fetching strategies:', error)
-      } finally {
-        setIsLoading(false)
-      }
+      } 
     }
     fetchstrategyinfo()
   }, [name])
@@ -52,20 +50,38 @@ function Dashboard() {
   useEffect(() => {
     if (strategies && strategies.mt5_id) {
       const fetchStats = async () => {
+        setIsLoading(true)
+        try {
+          let tradeHistory = null;
 
-        const res = await fetch("/api/trade-history", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ mt5_id: strategies.mt5_id }),
-        });
+          // Polling for the trade history until it matches the mt5_id
+          while (!tradeHistory || tradeHistory.mt5_id !== strategies.mt5_id) {
+            const res = await fetch("/api/trade-history", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ mt5_id: strategies.mt5_id }),
+            });
 
-        if (!res.ok) {
-          throw new Error('Failed to fetch data');
+            if (!res.ok) {
+              throw new Error("Failed to fetch data");
+            }
+
+            tradeHistory = await res.json();
+
+            if (!tradeHistory || tradeHistory.mt5_id !== strategies.mt5_id) {
+              // No match or trade history not available, wait before retrying
+              console.log("No match for mt5_id yet, retrying...");
+              await new Promise((resolve) => setTimeout(resolve, 500)); // Wait 1 second before retrying
+            }
+          }
+
+          // If we got the correct trade history, set it to state
+          setTrade(tradeHistory);
+        } catch (err) {
+        
+        } finally {
+          setIsLoading(false)
         }
-        console.log("not error")
-        const result = await res.json();
-        console.log(result);
-        setTrade(result);
         
       };
 
@@ -76,7 +92,7 @@ function Dashboard() {
 
 
 
-  
+  console.log(trade.positions)
   const { winRate, totalPnL, rrRatio, wins, losses, totalTrades } = useMemo(() => {
     console.log("ttttttttt", trade.positions)
     if (!trade?.positions || trade.positions.length === 0) {
@@ -558,14 +574,14 @@ function Dashboard() {
                       <ArrowUpRight className="w-4 h-4 inline ml-1" />
                     </button>
                   </Link>
-                </div>
+                </div> 
 
                 <div className='grid grid-cols-2 gap-4 mb-6'>
                   <div className='flex items-center p-3 rounded-lg border border-gray-700 bg-gray-900 hover:border-cyan-500 transition-all duration-300'>
                     <Zap className='text-yellow-400 mr-3' size={20} />
                     <div>
-                      <p className='text-gray-400 text-sm'>Running</p>
-                      <p className='text-white font-semibold'>500x</p>
+                      <p className='text-gray-400 text-sm'>Start Date</p>
+                      <p className='text-white font-semibold'>{strategies.start_date.split('T')[0]}</p>
                     </div>
                   </div>
 

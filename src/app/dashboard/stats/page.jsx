@@ -9,110 +9,94 @@ import { TrendingUp, TrendingDown, Clock, CircleDollarSign, Banknote, Wallet, Ba
 import { useSession } from "next-auth/react";
 
 function Stats() {
-    const [trade, setTrade] = useState([]);
+    //const [trade, setTrade] = useState([]);
     const { data: session } = useSession();
-    const [isLoading, setIsLoading] = useState(true)
 
     const [mt5accounts, setMt5accounts] = useState([]);
-    const [accountinfo, setAccountinfo] = useState([]);
-    const fetchMt5Account = async () => {
-        try {
-            const response = await fetch("/api/mt5account", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ user_id: session?.user?.id }),
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to fetch data');
-            }
-            const result = await response.json();
-            setMt5accounts(result);
-            console.log("all mt5   ", mt5accounts);
-            setIsLoading(false);
-        } catch (error) {
-            console.error("Error:", error);
-        }
-    };
-    const [hasFetchedAccounts, setHasFetchedAccounts] = useState(false);
 
 
 
-
-    const fetchStats = async (mt5AccountId) => {
-        try {
-            const res = await fetch("/api/trade-history", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ mt5_id: mt5AccountId }),
-            });
-
-            if (!res.ok) {
-                throw new Error(`Failed to fetch data for MT5 account ${mt5AccountId}`);
-            }
-            const result = await res.json();
-            setAccountinfo(prev => [...prev, result]);
-
-
-            return result.positions || []; // Return positions or empty array
-        } catch (error) {
-            console.error(error);
-            return []; // Return empty array in case of error
-        }
-    };
-
-
-
-
-
-
-
-
-
-
+    const [hasFetchedAccounts, setHasFetchedAccounts] = useState(true);
     useEffect(() => {
-        const fetchData = async () => {
-            if (session?.user?.id) {
-                await fetchMt5Account(); // Fetch accounts first
-                setHasFetchedAccounts(true); // Mark as fetched
+        if (!session) return; // Only run when session is available
+    
+        const fetchMt5Account = async () => {
+            try {
+                const response = await fetch("/api/mt5account", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ user_id: session?.user?.id }),
+                });
+    
+                if (!response.ok) {
+                    throw new Error("Failed to fetch data");
+                }
+    
+                const result = await response.json();
+                setMt5accounts(result);
+                console.log("all mt5   ", result);
+            } catch (error) {
+                console.error("Error:", error);
             }
         };
-        fetchData();
+    
+        fetchMt5Account();
     }, [session]);  // Runs only when session is available
 
+
+
+
+    // Fetch trades when `mt5accounts` is updated (and not empty)
     useEffect(() => {
-        if (hasFetchedAccounts && mt5accounts.length > 0) {
+
+        if (mt5accounts.length > 0) {
             fetchAllTrades();
         }
 
+    }, [mt5accounts]);  // Now, fetchAllTrades runs only when `mt5accounts` is fully updated
 
-    }, [hasFetchedAccounts]);  // Runs only once when accounts are fetched
+    console.log("mt5accounts  ", mt5accounts)
 
-    const [trades, setTrades] = useState([]);
-    const fetchAllTrades = async () => {
-        if (session?.user?.id && mt5accounts && mt5accounts.length > 0) {
+
+
+    const [accountinfo,setAccountinfo] = useState([])
+    const fetchStats = async (mt5AccountId) => {
+        let tradeHistory = null;
+        let retries = 0;
+        const maxRetries = 10; // Prevent infinite loop
+
+        while (!tradeHistory || tradeHistory.mt5_id !== mt5AccountId) {
             try {
-                // Use Promise.all to fetch trades for all accounts concurrently
-                const allTradePromises = mt5accounts.map(account =>
-                    fetchStats(account.mt5_id)
-                );
+                const res = await fetch("/api/trade-history", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ mt5_id: mt5AccountId }),
+                });
 
-                // Wait for all trades to be fetched
-                const allTradesArrays = await Promise.all(allTradePromises);
+                if (!res.ok) {
+                    throw new Error(`Failed to fetch data for MT5 account ${mt5AccountId}`);
+                }
 
-                // Flatten and concatenate all trades
-                const combinedTrades = allTradesArrays.flat();
+                tradeHistory = await res.json();
 
-                // Set combined trades
-                setTrades(combinedTrades);
+                if (!tradeHistory || tradeHistory.mt5_id !== mt5AccountId) {
+                    console.log(`No match for mt5_id ${mt5AccountId}, retrying...`);
+                    await new Promise((resolve) => setTimeout(resolve, 500)); // Wait before retrying
+
+                }
+
             } catch (error) {
-                console.error("Error fetching trades:", error);
+                console.error(`Error fetching stats for MT5 account ${mt5AccountId}:`, error);
+                return []; // Return empty array on failure
             }
         }
+        if (hasFetchedAccounts) {
+            setAccountinfo(prev => [...prev, tradeHistory]);
+            setHasFetchedAccounts(false);
+        }
+        return tradeHistory.positions || []; // Return positions or an empty array
     };
 
-    console.log(trades)
- 
 
     // New utility functions for data processing
     const parseDate = (dateTimeStr) => {
@@ -120,9 +104,47 @@ function Stats() {
         const [year, month, day] = datePart.split(".");
         return new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
     };
+    const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+    const [trades, setTrades] = useState([]);
+    const [loading,setLoading] = useState([]);
+    const fetchAllTrades = async () => {
+        if (session?.user?.id && mt5accounts.length > 0) {
+            setLoading(true);
+            try {
+                const allTradesArrays = await Promise.all(
+                    mt5accounts.map(async (account) => {
+                        try {
+                            // Introduce a delay (for example, 500ms) before fetching stats
+                            await delay(300);
+
+                            const trades = await fetchStats(account.mt5_id);
+                            return trades || []; // Ensure it always returns an array
+                        } catch (error) {
+                            console.log(`Failed to fetch trades for account ${account.mt5_id}:`, error);
+                            return []; // Return an empty array on failure to avoid breaking Promise.all
+                        }
+                    })
+                );
+
+
+                // Flatten and concatenate all trades
+                const combinedTrades = allTradesArrays.flat();
+
+                // Set combined trades
+                setTrades(combinedTrades);
+                setLoading(false);
+            } catch (error) {
+                console.error("Error fetching trades:", error);
+            }
+        }
+    };
+
+    console.log(trades);
+
     // Calculate Daily PNL
     const calculateDailyPNL = useMemo(() => {
-        if (!trades|| trades.length === 0) return [];
+        if (!trades || trades.length === 0) return [];
 
         const dailyPNLMap = new Map();
 
@@ -169,59 +191,9 @@ function Stats() {
     }, [trades]);
 
 
-   
+
     const [activeTimeframe, setActiveTimeframe] = useState("7d")
 
-
-     // const [mt5account, setMt5account] = useState("")
-    // useEffect(() => {
-    //     const fetchMt5accountsinfo = async () => {
-    //         setIsLoading(true)
-    //         try {
-    //             const response = await fetch("/api/mt5info", {
-    //                 method: "POST",
-    //                 headers: { "Content-Type": "application/json" },
-    //                 body: JSON.stringify({ id: id }),
-    //             })
-    //             if (!response.ok) {
-    //                 throw new Error(`Error: ${response.status}`)
-    //             }
-    //             const data = await response.json()
-    //             setMt5account(data)
-
-    //         } catch (error) {
-    //             console.error('Error fetching strategies:', error)
-    //         } finally {
-    //             setIsLoading(false)
-    //         }
-    //     }
-    //     fetchMt5accountsinfo()
-
-
-    // }, [id])
-
-    // useEffect(() => {
-    //     if (mt5account && mt5account.mt5_id) {
-    //         const fetchStats = async () => {
-
-    //             const res = await fetch("/api/trade-history", {
-    //                 method: "POST",
-    //                 headers: { "Content-Type": "application/json" },
-    //                 body: JSON.stringify({ mt5_id: mt5account.mt5_id }),
-    //             });
-
-    //             if (!res.ok) {
-    //                 throw new Error('Failed to fetch data');
-    //             }
-    //             console.log("not error")
-    //             const result = await res.json();
-    //             setTrade(result);
-
-    //         };
-
-    //         fetchStats();
-    //     }
-    // }, [mt5account.mt5_id]);
     const { winRate, totalPnL, rrRatio, wins, losses, totalTrades } = useMemo(() => {
         console.log("ttttttttt", trades)
         if (!trades || trades.length === 0) {
@@ -456,7 +428,7 @@ function Stats() {
                     { value: losses, name: 'Lost', itemStyle: { color: '#ef4444' } }
                 ]
 
-               
+
             }
         ]
     }
@@ -471,14 +443,7 @@ function Stats() {
 
 
 
-    
-    // if (!trades || trades === 0) {
-    //     return (
-    //         <div className="flex items-center justify-center min-h-screen bg-gray-900">
-    //             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-cyan-400"></div>
-    //         </div>
-    //     )
-    // }
+
 
 
     const formatDate = (dateTimeStr) => {
@@ -501,7 +466,7 @@ function Stats() {
             return acc;
         }, [])
         : [];
-   
+
 
 
 
@@ -607,7 +572,7 @@ function Stats() {
     }
     const totalBalance = accountinfo.reduce((sum, item) => sum + parseFloat(item.balance), 0);
     const totalEquity = accountinfo.reduce((sum, item) => sum + parseFloat(item.equity), 0);
-
+    console.log("accountiinfo ", accountinfo)
     return (
         <div className="min-h-screen bg-gray-900 text-white">
             {/* Header with animated gradient overlay - matching the main page */}
@@ -646,7 +611,7 @@ function Stats() {
             </div>
 
             <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
-                {isLoading ? (
+                {loading ? (
                     <div className="flex items-center justify-center min-h-[50vh]">
                         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-cyan-400"></div>
                     </div>
@@ -659,17 +624,12 @@ function Stats() {
                                     <div className='space-y-2'>
                                         <h2 className='text-2xl font-bold text-white'>Account {session?.user?.name}</h2>
                                         <div className=''>
-                                           
+
                                         </div>
-                                        
+
 
                                     </div>
-                                    {/* <Link href={`/copy/${name}`}>
-                    <button className='bg-gradient-to-r from-cyan-500 to-blue-600 hover:shadow-cyan-500/30 text-white font-medium py-2 px-4 rounded-lg transition-all transform hover:scale-105 shadow-lg'>
-                      Copy Strategy
-                      <ArrowUpRight className="w-4 h-4 inline ml-1" />
-                    </button>
-                  </Link> */}
+
                                 </div>
 
                                 <div className='grid grid-cols-2 gap-4 mb-6'>

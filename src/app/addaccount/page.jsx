@@ -53,7 +53,7 @@
 //   const [token, setToken] = useState("");
 
 //   const generateToken = () => {
-    
+
 //     const newToken = cryptoRandomString({ length: 32, type: "alphanumeric" });
 //     setToken(newToken);
 //   };  
@@ -66,7 +66,7 @@
 //   const CreateAccount = async () => {
 //     setComplete(false);
 //     setUncomplete(false);
-   
+
 //     setLoading(true);
 //     setSuccess(false);
 //     try {
@@ -75,9 +75,9 @@
 //         headers: { "Content-Type": "application/json" },
 //         body: JSON.stringify({ token: token, user_id: session?.user?.id }),
 //       });
-  
+
 //       const data = await response.json();
-  
+
 //       if (response.ok) {
 //         setSuccess(true);
 //         console.log(data)
@@ -98,9 +98,9 @@
 //     } finally {
 //       setLoading(false);
 //     }
-    
+
 //   };
- 
+
 
 
 
@@ -110,29 +110,29 @@
 
 //   const CountdownTimer = ({ minutes = 5 }) => {
 //     const [timeLeft, setTimeLeft] = useState(minutes * 60);
-  
+
 //     useEffect(() => {
 //       if (timeLeft <= 0) return;
-  
+
 //       const timer = setInterval(() => {
 //         setTimeLeft((prev) => prev - 1);
 //       }, 1000);
-  
+
 //       return () => clearInterval(timer);
 //     }, [timeLeft]);
-  
+
 //     const formatTime = (time) => {
 //       const mins = Math.floor(time / 60);
 //       const secs = time % 60;
 //       return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
 //     };
-  
+
 //     return <h1>Time Left: {formatTime(timeLeft)}</h1>;
 //   };
 
 //   return (
 //     <Container>
- 
+
 //       <div className='min-h-screen  flex justify-center'>
 //         {setupGuide && (
 //           <div className="fixed inset-1 flex items-center justify-center bg-black bg-opacity-50 z-10">
@@ -192,9 +192,9 @@
 //                 {/* <div className='text-xs text-blue-500 underline cursor-pointer' onClick={() => setSetupGuide(true)}>
 //                   How to setup EA Metatrader5?
 //                 </div> */}
-             
+
 //                 <h1 className='font-bold'>Token</h1>
-              
+
 //                 <div className="relative z-0  w-full max-w-md">
 //                   <input type='text' className='w-full p-2 border rounded-lg' disabled autoComplete='on' value={token} />
 //                   <button
@@ -226,8 +226,8 @@
 //                       <div className='mt-8 text-center text-gray-500 '>
 //                         <div className='text-lg'>connect success </div> 
 //                         <div className='text-xs'>go to <Link href="/dashboard" className='text-blue-900 underline'>Dashboard?</Link> Connect <Link href="/dashboard" className='text-blue-900 underline'>More?</Link></div>
-                        
-                        
+
+
 //                       </div>
 //                       {/* <div className='text-center text-gray-500 text-xs'>หากท่านเชื่อมต่อบัญชี MT5 ไม่สำเร็จกรุณารับ Token ใหม่อีกครั้งภายใน  </div> */}
 //                     </div>
@@ -243,12 +243,12 @@
 //                     </div>
 //                 )}
 //               </div>
-              
-              
 
-             
+
+
+
 //             </div>
-         
+
 //           )}
 
 //           {/* Common Fields for Both Real & Demo */}
@@ -265,8 +265,8 @@
 //               <input type='text' maxLength='20' className='w-full p-2 border rounded-lg hover:border-2 hover:border-brandColor focus:outline-brandColor' />
 //             </>
 //           )}
-         
-       
+
+
 //           {/* Create Account Button */}
 //           <Link href='/addaccount'>
 //             <div className={`w-full duration-300 p-4 text-white rounded-lg text-center cursor-pointer mt-4 p-4 ${loading ? "bg-gray-300" : "bg-gray-600"}`}  onClick={loading ? undefined:CreateAccount }>
@@ -278,7 +278,7 @@
 //           </div>
 //         </div>
 //       </div>
-      
+
 //     </Container>
 //   )
 // }
@@ -332,7 +332,7 @@ import Container from '../components/Container'
 
 function Addaccount() {
   const { data: session } = useSession();
-  
+
   const [isReal, setIsReal] = useState(true);
   const [setupGuide, setSetupGuide] = useState(false);
   const [token, setToken] = useState("");
@@ -351,7 +351,7 @@ function Addaccount() {
     const newToken = cryptoRandomString({ length: 32, type: "alphanumeric" });
     setToken(newToken);
   };
-  
+
   const copyToClipboard = () => {
     navigator.clipboard.writeText(token);
   };
@@ -361,23 +361,23 @@ function Addaccount() {
     setUncomplete(false);
     setLoading(true);
     setSuccess(false);
-    
+
     try {
       const response = await fetch("/api/create-token", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token: token, user_id: session?.user?.id }),
       });
-  
+
       const data = await response.json();
-  
+
       if (response.ok) {
         setSuccess(true);
       } else {
         alert(data.error || "Failed to verify token.");
       }
 
-      if (data?.message){
+      if (data?.message) {
         setComplete(true)
       } else {
         setUncomplete(true)
@@ -391,42 +391,41 @@ function Addaccount() {
 
   const CountdownTimer = ({ minutes = 5 }) => {
     const [timeLeft, setTimeLeft] = useState(minutes * 60);
-  
+
     useEffect(() => {
       if (timeLeft <= 0) return;
-  
+
       const timer = setInterval(() => {
         setTimeLeft((prev) => prev - 1);
       }, 1000);
-  
+
       return () => clearInterval(timer);
     }, [timeLeft]);
-  
+
     const formatTime = (time) => {
       const mins = Math.floor(time / 60);
       const secs = time % 60;
       return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
     };
-  
+
     return <span className="font-mono text-xl">{formatTime(timeLeft)}</span>;
   };
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
-      {/* Hero Section with animated gradient overlay */}
+
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-indigo-800 to-blue-900 opacity-70"></div>
         <div className="absolute inset-0 opacity-20" style={{
           backgroundSize: "cover",
           backgroundPosition: "center"
         }}></div>
-        
-        {/* Animated dots/grid pattern for tech feel */}
-        <div className="absolute inset-0 opacity-10" style={{ 
+
+        <div className="absolute inset-0 opacity-10" style={{
           backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px)",
           backgroundSize: "30px 30px"
         }}></div>
-        
+
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20">
           <div className="text-center mb-12">
             <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">
@@ -442,7 +441,7 @@ function Addaccount() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 mt-8">
         <div className="flex justify-center">
           {setupGuide && (
-            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50">
+            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50 ">
               <div className="bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-700 w-full max-w-md">
                 {/* Modal Header */}
                 <div className="flex justify-between items-center mb-6">
@@ -456,7 +455,7 @@ function Addaccount() {
                 <div className="space-y-4 text-gray-300">
                   <div className="flex items-start">
                     <div className="bg-cyan-500 text-white w-6 h-6 rounded-full flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">1</div>
-                    <p>Download the <span className="font-semibold text-white">ctrlcAPI.ex5</span> file from our website.</p>
+                    <p>Download the <span className="font-semibold text-white">CTRLC.zip</span> file from our website.</p>
                   </div>
                   <div className="flex items-start">
                     <div className="bg-cyan-500 text-white w-6 h-6 rounded-full flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">2</div>
@@ -464,14 +463,27 @@ function Addaccount() {
                   </div>
                   <div className="flex items-start">
                     <div className="bg-cyan-500 text-white w-6 h-6 rounded-full flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">3</div>
-                    <p>Place the <span className="font-semibold text-white">ctrlcAPI.ex5</span> file in the <span className="font-semibold text-white">MQL5/Experts</span> folder.</p>
+                    <p>Place the <span className="font-semibold text-white">CTRLCapi.ex5</span> file in the <span className="font-semibold text-white">MQL5/Experts</span> folder.</p>
                   </div>
                   <div className="flex items-start">
                     <div className="bg-cyan-500 text-white w-6 h-6 rounded-full flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">4</div>
-                    <p>Restart MetaTrader 5 and attach the EA to your chart.</p>
+                    <p>Place the <span className="font-semibold text-white">libsodium.dll </span> and <span className="font-semibold text-white">libzmq.dll </span>file in the <span className="font-semibold text-white">MQL5/Libraries</span> folder.</p>
+                  </div>
+               
+                  <div className="flex items-start">
+                    <div className="bg-cyan-500 text-white w-6 h-6 rounded-full flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">5</div>
+                    <p>Go to tools --- Options --- Expert Advisors</p>
+
+                  </div>
+                  <div className="flex items-start">
+                    <img src="/tools.png"></img>
                   </div>
                   <div className="flex items-start">
                     <div className="bg-cyan-500 text-white w-6 h-6 rounded-full flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">5</div>
+                    <p>Restart MetaTrader 5 and attach the EA to your chart.</p>
+                  </div>
+                  <div className="flex items-start">
+                    <div className="bg-cyan-500 text-white w-6 h-6 rounded-full flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">6</div>
                     <p>Enable <span className="font-semibold text-white">Algo Trading</span> and check for successful connection.</p>
                   </div>
                 </div>
@@ -504,17 +516,17 @@ function Addaccount() {
                     <div className={`absolute top-1 left-1 h-10 w-1/2 rounded-md transition-all duration-300 bg-gradient-to-r from-cyan-500 to-blue-600 ${isReal ? "translate-x-0" : "translate-x-full"}`}></div>
                     {/* Text Labels */}
                     <div className="relative flex w-full z-10">
-                      <button 
+                      <button
                         className={`w-1/2 h-10 text-center font-medium ${isReal ? "text-white" : "text-gray-400"}`}
                         onClick={() => setIsReal(true)}
                       >
-                        Real Account
+                        Copy Account
                       </button>
-                      <button 
+                      <button
                         className={`w-1/2 h-10 text-center font-medium ${!isReal ? "text-white" : "text-gray-400"}`}
                         onClick={() => setIsReal(false)}
                       >
-                        Demo Account
+                        Master Account
                       </button>
                     </div>
                   </div>
@@ -527,23 +539,26 @@ function Addaccount() {
                       To connect your MT5 account to our platform, download and set up our ctrlcAPI.
                       Follow the setup guide to securely link your MT5 account.
                     </p>
-                    
-                    <button className="w-full py-3 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-lg font-medium shadow-lg hover:shadow-cyan-500/30 transition-all duration-300 flex items-center justify-center">
-                      Download ctrlcAPI
-                    </button>
-                    
+                    <a href="/CTRLC.zip" download="CTRLCapi">
+                      <button className="w-full py-3 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-lg font-medium shadow-lg hover:shadow-cyan-500/30 transition-all duration-300 flex items-center justify-center">
+                        Download ctrlcAPI
+                      </button>
+
+                    </a>
+
+
                     <div className="space-y-2">
                       <label className="font-semibold flex items-center">
                         Your Connection Token
                         <Shield className="h-4 w-4 ml-2 text-cyan-400" />
                       </label>
-                      
+
                       <div className="relative">
-                        <input 
-                          type="text" 
-                          className="w-full p-3 bg-gray-900 border border-gray-700 rounded-lg text-gray-300 focus:border-cyan-500 focus:outline-none" 
-                          readOnly 
-                          value={token} 
+                        <input
+                          type="text"
+                          className="w-full p-3 bg-gray-900 border border-gray-700 rounded-lg text-gray-300 focus:border-cyan-500 focus:outline-none"
+                          readOnly
+                          value={token}
                         />
                         <button
                           onClick={copyToClipboard}
@@ -552,8 +567,8 @@ function Addaccount() {
                           <ClipboardCopy className="w-5 h-5" />
                         </button>
                       </div>
-                      
-                      <button 
+
+                      <button
                         className="w-full py-3 bg-gray-900 border border-gray-700 hover:border-cyan-500 rounded-lg font-medium transition-all duration-300 flex items-center justify-center"
                         onClick={generateToken}
                       >
@@ -561,7 +576,7 @@ function Addaccount() {
                         <span>Generate Token</span>
                       </button>
                     </div>
-                    
+
                     <div className="mt-8 py-4">
                       {(loading && !success) && (
                         <div className="text-center space-y-4">
@@ -571,7 +586,7 @@ function Addaccount() {
                           </div>
                         </div>
                       )}
-                      
+
                       {complete && (
                         <div className="text-center space-y-4">
                           <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center mx-auto">
@@ -595,7 +610,7 @@ function Addaccount() {
                           </div>
                         </div>
                       )}
-                      
+
                       {uncomplete && (
                         <div className="text-center space-y-4">
                           <div className="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center mx-auto">
@@ -620,32 +635,32 @@ function Addaccount() {
                   <div className="space-y-6">
                     <div className="space-y-2">
                       <label className="font-semibold">Initial Balance</label>
-                      <input 
-                        type="number" 
-                        placeholder="100-100000" 
+                      <input
+                        type="number"
+                        placeholder="100-100000"
                         className="w-full p-3 bg-gray-900 border border-gray-700 rounded-lg text-gray-300 focus:border-cyan-500 focus:outline-none"
                         value={amount}
                         onChange={(e) => setAmount(e.target.value)}
                       />
                       <p className="text-xs text-gray-500">Set your starting capital (100-100,000)</p>
                     </div>
-                    
+
                     <div className="space-y-2">
                       <label className="font-semibold">Leverage</label>
-                      <input 
-                        type="number" 
+                      <input
+                        type="number"
                         className="w-full p-3 bg-gray-900 border border-gray-700 rounded-lg text-gray-300 focus:border-cyan-500 focus:outline-none"
                         value={leverage}
                         onChange={(e) => setLeverage(e.target.value)}
                       />
                       <p className="text-xs text-gray-500">Choose leverage between 1-1000</p>
                     </div>
-                    
+
                     <div className="space-y-2">
                       <label className="font-semibold">Account Name</label>
-                      <input 
-                        type="text" 
-                        maxLength="20" 
+                      <input
+                        type="text"
+                        maxLength="20"
                         className="w-full p-3 bg-gray-900 border border-gray-700 rounded-lg text-gray-300 focus:border-cyan-500 focus:outline-none"
                         placeholder="My Demo Account"
                       />
@@ -656,18 +671,18 @@ function Addaccount() {
 
                 {/* Connect Button */}
                 <div className="mt-8">
-                  <button 
+                  <button
                     className={`w-full py-4 rounded-lg font-medium text-center transition-all duration-300 flex items-center justify-center ${loading ? "bg-gray-700 cursor-not-allowed" : "bg-gradient-to-r from-cyan-500 to-blue-600 shadow-lg hover:shadow-cyan-500/30"}`}
-                    onClick={loading ? undefined :  CreateAccount }
+                    onClick={loading ? undefined : CreateAccount}
                     disabled={loading}
                   >
                     {isReal ? "Connect MT5 Account" : "Create Demo Account"}
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </button>
                 </div>
-                
+
                 <div className="mt-4 text-center">
-                  <button 
+                  <button
                     className="text-cyan-400 text-sm hover:underline flex items-center justify-center mx-auto"
                     onClick={() => setSetupGuide(true)}
                   >

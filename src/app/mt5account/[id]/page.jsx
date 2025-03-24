@@ -87,7 +87,7 @@ function Stats() {
 
   useEffect(() => {
     const fetchMt5accountsinfo = async () => {
-      setIsLoading(true)
+    
       try {
         const response = await fetch("/api/mt5info", {
           method: "POST",
@@ -103,36 +103,79 @@ function Stats() {
       } catch (error) {
         console.error('Error fetching strategies:', error)
       } finally {
-        setIsLoading(false)
+        
       }
     }
     fetchMt5accountsinfo()
 
 
   }, [id])
-
+ 
   useEffect(() => {
-    if (mt5account && mt5account.mt5_id) {
+    if (mt5account.mt5_id) {
       const fetchStats = async () => {
+        setIsLoading(true)
+        
+        try {
+          let tradeHistory = null;
 
-        const res = await fetch("/api/trade-history", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ mt5_id: mt5account.mt5_id }),
-        });
+          // Polling for the trade history until it matches the mt5_id
+          while (!tradeHistory || tradeHistory.mt5_id !== mt5account.mt5_id) {
+            const res = await fetch("/api/trade-history", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ mt5_id: mt5account.mt5_id }),
+            });
 
-        if (!res.ok) {
-          throw new Error('Failed to fetch data');
+            if (!res.ok) {
+              throw new Error("Failed to fetch data");
+            }
+
+            tradeHistory = await res.json();
+
+            if (!tradeHistory || tradeHistory.mt5_id !== mt5account.mt5_id) {
+              // No match or trade history not available, wait before retrying
+              console.log("No match for mt5_id yet, retrying...");
+              await new Promise((resolve) => setTimeout(resolve, 500)); // Wait 1 second before retrying
+            }
+          }
+
+          // If we got the correct trade history, set it to state
+          setTrade(tradeHistory);
+        } catch (err) {
+        
+        } finally {
+          setIsLoading(false)
         }
-        console.log("not error")
-        const result = await res.json();
-        setTrade(result);
+      };
 
-    };
-
-    fetchStats();
-  }
+      fetchStats();
+    }
   }, [mt5account.mt5_id]);
+
+  
+  // useEffect(() => {
+  //   if (mt5account.mt5_id) {
+  //     const fetchStats = async () => {
+
+  //       const res = await fetch("/api/trade-history", {
+  //         method: "POST",
+  //         headers: { "Content-Type": "application/json" },
+  //         body: JSON.stringify({ mt5_id: mt5account.mt5_id }),
+  //       });
+
+  //       if (!res.ok) {
+  //         throw new Error('Failed to fetch data');
+  //       } 
+  //       console.log("not error")
+  //       const result = await res.json();
+  //       setTrade(result);
+
+  //   };
+
+  //   fetchStats();
+  // }
+  // }, [mt5account.mt5_id]);
 
 
 
@@ -444,9 +487,9 @@ function Stats() {
     },
     grid: {
       left: '3%',
-      right: '4%',
+      right: '4%', 
       bottom: '3%',
-      containLabel: true
+      containLabel: true 
     },
     xAxis: {
       type: 'category',
@@ -719,6 +762,6 @@ function Stats() {
       </div>
     </div>
   )
-}
+} 
 
 export default Stats            

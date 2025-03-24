@@ -233,11 +233,61 @@ function RegisterPage() {
                     <div className="relative w-64 h-64 mb-8">
                         <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full blur-lg opacity-70 animate-pulse"></div>
                         <div className="relative bg-gray-800 bg-opacity-50 rounded-full p-4 w-full h-full flex items-center justify-center border border-blue-700">
-                            <img 
-                                src="https://cdn-icons-png.flaticon.com/512/6059/6059261.png" 
-                                alt="Break Even" 
-                                className="w-40 h-40"
-                            />
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                <defs>
+                                    <linearGradient id="primaryGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" stopColor="#06b6d4" /> 
+                                        <stop offset="100%" stopColor="#2563eb" /> 
+                                    </linearGradient>
+
+                                    <linearGradient id="accentGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                        <stop offset="0%" stopColor="#4CAF50" stopOpacity="0.8" />
+                                        <stop offset="100%" stopColor="#2196F3" stopOpacity="0.8" /> 
+                                    </linearGradient>
+
+                                    <linearGradient id="downGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                        <stop offset="0%" stopColor="#E91E63" stopOpacity="0.8" /> 
+                                        <stop offset="100%" stopColor="#9C27B0" stopOpacity="0.8" /> 
+                                    </linearGradient>
+
+                                    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                                        <feGaussianBlur stdDeviation="6" result="blur" />
+                                        <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                                    </filter>
+                                </defs>
+
+                                <g transform="translate(256, 256)">
+                                    <circle cx="0" cy="0" r="140" fill="#1e293b" stroke="url(#primaryGradient)" strokeWidth="8" />
+
+                                    <path d="M-70,-40 H-20 V-15 H-45 V15 H-20 V40 H-70 V15 H-45 V-15 H-70 Z"
+                                        fill="url(#primaryGradient)" filter="url(#glow)" />
+
+                                    <path d="M20,-40 H70 V-15 H45 A30,30 0 0,0 45,15 H70 V40 H20 A60,60 0 0,1 20,-40 Z"
+                                        fill="url(#primaryGradient)" filter="url(#glow)" />
+                                </g>
+
+                              
+
+                                <g filter="url(#glow)">
+                                    <circle cx="256" cy="256" r="230" fill="none" stroke="url(#primaryGradient)" strokeWidth="3" strokeDasharray="15,10" />
+
+                                    <g transform="translate(256, 65) rotate(0)">
+                                        <path d="M0,0 L15,-20 L-15,-20 Z" fill="#06b6d4" />
+                                    </g>
+
+                                    <g transform="translate(256, 447) rotate(180)">
+                                        <path d="M0,0 L15,-20 L-15,-20 Z" fill="#2563eb" />
+                                    </g>
+
+                                    <g transform="translate(65, 256) rotate(270)">
+                                        <path d="M0,0 L15,-20 L-15,-20 Z" fill="#06b6d4" />
+                                    </g>
+
+                                    <g transform="translate(447, 256) rotate(90)">
+                                        <path d="M0,0 L15,-20 L-15,-20 Z" fill="#2563eb" />
+                                    </g>
+                                </g>
+                            </svg>
                         </div>
                     </div>
                     
@@ -248,13 +298,7 @@ function RegisterPage() {
                         <p className="text-xl text-gray-300 mb-4">
                             Join our trading community today
                         </p>
-                        <div className="flex justify-center space-x-4">
-                            {["24,500+ Users", "$4.2B+ Volume", "120+ Countries"].map((stat, i) => (
-                                <div key={i} className="bg-gray-800 bg-opacity-50 px-4 py-2 rounded-lg border border-gray-700">
-                                    <p className="text-sm text-cyan-400">{stat}</p>
-                                </div>
-                            ))}
-                        </div>
+                       
                     </div>
                     
                     <div className="max-w-sm">

@@ -18,7 +18,10 @@ const strategieSchema = new Schema(
             type: String,
             required: false,
         },
-     
+        traders: { type: Number, default: 0 }
+
+
+
 
     },
     { timestamps: true }

@@ -67,12 +67,14 @@ export async function POST(req) {
                     strategy_name: '$strategy.name',
                     symbol: '$strategy.symbol',
                     status: '$subscriptions.status',
-                    sub_id : '$subscriptions._id'
+                    sub_id : '$subscriptions._id',
+                    start_date: '$subscriptions.start_date',
+                    end_date: '$subscriptions.end_date',
                 }
             }
         ]);
 
-        console.log("Fetched Subscriptions:", result); // Debugging log
+        //console.log("Fetched Subscriptions:", result); // Debugging log
         return NextResponse.json(result, { status: 200 });
 
     } catch (error) {
